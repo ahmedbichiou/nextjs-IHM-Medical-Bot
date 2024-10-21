@@ -63,12 +63,15 @@ const CapsuleDetail = () => {
   }
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box>
       <Grid container spacing={3}>
         {/* Capsule Content */}
         <Grid item xs={12}>
           <Card sx={{ borderRadius: '15px', boxShadow: 3 }}>
             <CardContent>
+            <Typography  margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
+  {capsuleId}
+</Typography>
               <Typography variant="h5" gutterBottom color="error">
                 {capsuleData.content}
               </Typography>
