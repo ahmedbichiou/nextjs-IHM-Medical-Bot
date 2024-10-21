@@ -1,22 +1,19 @@
 'use client';
 import { useEffect, useState } from 'react'; // Import useState and useEffect
-import { Grid, Box, Card, CardContent, Typography, Divider } from '@mui/material';
+import { Grid, Box, Card, CardContent, Typography, Divider, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import { useRouter } from 'next/navigation';
-import { Capsule } from './types' // Ensure you have a Capsule type defined if needed
+import { Capsule } from './types'; // Ensure you have a Capsule type defined if needed
+import { Patient } from './types'; // Import the Patient type
 
 const Dashboard = () => {
   const [capsules, setCapsules] = useState<Capsule[]>([]); // State to hold fetched capsules
-  const patients = [
-    { name: "John Doe", id: "john-doe" },
-    { name: "Jane Smith", id: "jane-smith" },
-    { name: "Alice Brown", id: "alice-brown" },
-    { name: "Robert Johnson", id: "robert-johnson" },
-  ];
-  
+  const [patients, setPatients] = useState<Patient[]>([]); // State to hold fetched patients
   const router = useRouter();
-
+  const handleAddPatient = () => {
+    router.push('/addpatient'); // Navigate to the Add Patient page
+  };
   // Fetch capsules from the API when the component mounts
   useEffect(() => {
     const fetchCapsules = async () => {
@@ -32,7 +29,21 @@ const Dashboard = () => {
       }
     };
 
-    fetchCapsules(); // Call the fetch function
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/patients'); // Adjust the URL if needed
+        if (!response.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        const data: Patient[] = await response.json(); // Parse the JSON response
+        setPatients(data); // Set the fetched patients to state
+      } catch (error) {
+        console.error('Error fetching patients:', error); // Handle error
+      }
+    };
+
+    fetchCapsules(); // Call the fetch function for capsules
+    fetchPatients(); // Call the fetch function for patients
   }, []); // Empty dependency array ensures this runs once on mount
 
   const handleCapsuleClick = (id: string) => {
@@ -75,47 +86,47 @@ const Dashboard = () => {
 
                   {/* Capsules Section */}
                   <Grid item xs={12} marginTop={2}>
-  <Grid container spacing={2}>
-    {capsules.map((capsule) => (
-      <Grid item xs={6} key={capsule.id}>
-        <Card
-          onClick={() => handleCapsuleClick(capsule.id)} // Handle click event
-          sx={{
-            flex: 1,
-            borderRadius: '15px',
-            boxShadow: 3,
-            cursor: 'pointer',
-            transition: '0.3s',
-            '&:hover': {
-              boxShadow: 6,
-            },
-            padding: '16px',
-            height: '200px', // Ensures all cards are the same height
-          }}
-        >
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Typography variant="h6" color="primary" gutterBottom>
-              {capsule.id} {/* Display ID at the top */}
-            </Typography>
-            <Typography variant="body1" color="textSecondary" marginBottom={1}>
-              {capsule.content} {/* Display content right under the ID */}
-            </Typography>
-            <Divider style={{ margin: '8px 0' }} />
-            <Typography variant="body2" color="textSecondary">
-              <strong>Time:</strong> {capsule.time}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              <strong>Date:</strong> {capsule.date}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              <strong>Patient:</strong> <br />{capsule.patient}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-    ))}
-  </Grid>
-</Grid>
+                    <Grid container spacing={2}>
+                      {capsules.map((capsule) => (
+                        <Grid item xs={6} key={capsule.id}>
+                          <Card
+                            onClick={() => handleCapsuleClick(capsule.id)} // Handle click event
+                            sx={{
+                              flex: 1,
+                              borderRadius: '15px',
+                              boxShadow: 3,
+                              cursor: 'pointer',
+                              transition: '0.3s',
+                              '&:hover': {
+                                boxShadow: 6,
+                              },
+                              padding: '16px',
+                              height: '200px', // Ensures all cards are the same height
+                            }}
+                          >
+                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                              <Typography variant="h6" color="primary" gutterBottom>
+                                {capsule.id} {/* Display ID at the top */}
+                              </Typography>
+                              <Typography variant="body1" color="textSecondary" marginBottom={1}>
+                                {capsule.content} {/* Display content right under the ID */}
+                              </Typography>
+                              <Divider style={{ margin: '8px 0' }} />
+                              <Typography variant="body2" color="textSecondary">
+                                <strong>Time:</strong> {capsule.time}
+                              </Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                <strong>Date:</strong> {capsule.date}
+                              </Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                <strong>Patient:</strong> <br />{capsule.patient}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Grid>
                   {/* Capsules Section END */}
                 </Grid>
               </CardContent>
@@ -132,14 +143,25 @@ const Dashboard = () => {
               }}
             >
               <CardContent>
+                <Grid container spacing={3}>   
+              <Grid item xs={8}>
                 <Typography variant="h5" gutterBottom>
                   Patient List
-                </Typography>
+                </Typography></Grid>
+                <Grid item xs={4}>
+                <Button
+                  sx={{ mt: -1, borderRadius: '15px' }} // Added borderRadius for rounded corners
+                  variant="contained"
+                  onClick={handleAddPatient}
+                  color="primary" // You can change the color as needed
+                >
+                  Add
+                </Button></Grid>
                 {/* Patients List Section */}
                 <Grid item xs={12}>
                   <Grid container spacing={2} marginTop={1}>
-                    {patients.map((patient, index) => (
-                      <Grid item xs={12} key={index}>
+                    {patients.map((patient) => (
+                      <Grid item xs={12} key={patient.id}> {/* Use patient.id instead of index */}
                         <Card
                           onClick={() => handlePatientClick(patient.id)} // Handle click event
                           sx={{
@@ -165,6 +187,7 @@ const Dashboard = () => {
                       </Grid>
                     ))}
                   </Grid>
+                </Grid>
                 </Grid>
               </CardContent>
             </Card>
