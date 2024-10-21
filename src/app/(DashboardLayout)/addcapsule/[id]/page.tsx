@@ -1,30 +1,50 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Card, CardContent, Typography, TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useRouter, usePathname } from 'next/navigation';
-import { idText } from 'typescript';
+import { Patient } from '../../types'; // Adjust the import path accordingly
 
 const AddCapsule = () => {
   const router = useRouter();
   const pathname = usePathname();
   const capsuleId = pathname.split('/').pop(); // Get capsule ID from URL
   
-  // State variables for capsule details
+  // State variables for capsule details and patients
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [content, setContent] = useState('');
+  const [patients, setPatients] = useState<Patient[]>([]); // Use Patient type here
+  const [selectedPatientId, setSelectedPatientId] = useState<string>(''); // Use string type here
+
+  // Fetch patients on component mount
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/patients');
+        if (!response.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        const data: Patient[] = await response.json(); // Specify the expected type
+        setPatients(data); // Set the fetched patients
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent page reload
-    const id = capsuleId; // Use the capsuleId from the URL
     const newCapsule = {
-      id,
+      id: capsuleId, // Use the capsuleId from the URL
       date,
       time,
       content,
+      patient: selectedPatientId, // Include the selected patient ID
     };
-  
+
     try {
       const response = await fetch('http://localhost:5000/api/capsules', {
         method: 'POST',
@@ -33,11 +53,11 @@ const AddCapsule = () => {
         },
         body: JSON.stringify(newCapsule),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add capsule');
       }
-  
+
       // Redirect to the root after successful submission
       router.push('/'); // Navigate to the root page
     } catch (error) {
@@ -45,17 +65,15 @@ const AddCapsule = () => {
       // Handle error (e.g., show a message)
     }
   };
-  
 
   return (
     <Box>
       <Card sx={{ borderRadius: '15px', boxShadow: 3, width: '100%' }}>
         <CardContent>
-          <Typography  margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
-  {capsuleId}
-</Typography>
+          <Typography margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
+            {capsuleId}
+          </Typography>
 
-          
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
@@ -77,6 +95,25 @@ const AddCapsule = () => {
               onChange={(e) => setTime(e.target.value)}
               InputLabelProps={{ shrink: true }}
             />
+            <FormControl fullWidth variant="outlined" margin="normal">
+              <InputLabel id="patient-select-label">Select Patient</InputLabel>
+              <Select
+                labelId="patient-select-label"
+                value={selectedPatientId}
+                onChange={(e) => setSelectedPatientId(e.target.value)}
+                label="Select Patient"
+                required
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {patients.map((patient) => (
+                  <MenuItem key={patient.id} value={patient.id}>
+                    {patient.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               fullWidth
               label="Content"

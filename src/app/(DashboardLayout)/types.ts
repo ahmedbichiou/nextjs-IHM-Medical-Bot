@@ -5,4 +5,10 @@ export interface Capsule {
     date: string;
     patient: string;
   }
+  // types.ts
+
+export interface Patient {
+    id: string; // Unique identifier for the patient
+    name: string; // Name of the patient
+   description: string;  }
   
