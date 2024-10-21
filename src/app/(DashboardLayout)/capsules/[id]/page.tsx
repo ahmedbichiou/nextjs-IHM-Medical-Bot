@@ -1,7 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { Box, Card, CardContent, Grid, Typography, Divider, CircularProgress } from '@mui/material';
+import { usePathname, useRouter } from 'next/navigation';
+import { Box, Card, CardContent, Grid, Typography, Divider, CircularProgress, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { useEffect, useState } from 'react';
 
@@ -11,6 +11,7 @@ const CapsuleDetail = () => {
   const [capsuleData, setCapsuleData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [remainingTime, setRemainingTime] = useState<string>('00:00'); // Initial remaining time
+  const router = useRouter();
 
   useEffect(() => {
     // Fetch capsule data based on the capsuleId from the URL
@@ -54,6 +55,40 @@ const CapsuleDetail = () => {
     setRemainingTime(`${String(hoursLeft).padStart(2, "0")}:${String(minutesLeft).padStart(2, "0")}`);
   };
 
+  // -------------------------
+  const handleClearCapsule = async () => {
+    const emptyCapsule = {
+      content: "",
+      time: "",
+      date: "",
+      patient: "",
+      id: capsuleId, // Set the id to the capsuleId from the URL
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/capsules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emptyCapsule),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear the capsule');
+      }
+
+      // Optionally: Fetch the updated capsule data
+      const updatedData = await response.json();
+      setCapsuleData(updatedData);
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+  //-------------------------------
+
   if (loading) {
     return <CircularProgress />; // Show loading spinner while fetching data
   }
@@ -72,8 +107,8 @@ const CapsuleDetail = () => {
             <Typography  margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
   {capsuleId}
 </Typography>
-              <Typography variant="h5" gutterBottom color="error">
-                {capsuleData.content}
+              <Typography variant="body1" color="textSecondary">
+                 Delivery Time for {capsuleData.content}
               </Typography>
               <Divider />
               {/* Delivery Time Section */}
@@ -113,16 +148,18 @@ const CapsuleDetail = () => {
                 <Typography variant="body1" color="textSecondary">
                   Medications
                 </Typography>
-                {capsuleData.content}
                 <Card sx={{ padding: 2, marginTop: 1 }}>
                   <Typography variant="h6" color="primary"></Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Type Medicament:
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Number:
+                    Type Medicament: {capsuleData.content}
                   </Typography>
                 </Card>
+              </Box>
+              {/* Vider la capsule Button */}
+              <Box marginTop={4} display="flex" justifyContent="center">
+                <Button variant="contained" color="secondary" onClick={handleClearCapsule}>
+                  Vider la capsule
+                </Button>
               </Box>
             </CardContent>
           </Card>
