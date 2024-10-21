@@ -1,38 +1,36 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Box, Card, CardContent, Grid, Typography, Divider } from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography, Divider, CircularProgress } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import CircularProgress from '@mui/material/CircularProgress';
 import { useEffect, useState } from 'react';
 
 const CapsuleDetail = () => {
   const pathname = usePathname();
   const capsuleId = pathname.split('/').pop(); // Get capsule ID from URL
   const [capsuleData, setCapsuleData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [remainingTime, setRemainingTime] = useState<string>('00:00'); // Initial remaining time
-
-  const capsules = [
-    { content: "Capsule 1", time: "10:00 AM", date: "2024-10-21", patient: "John Doe", id: "capsule1" },
-    { content: "Capsule 2", time: "11:00 AM", date: "2024-10-22", patient: "Jane Smith", id: "capsule2" },
-    { content: "Capsule 3", time: "12:00 PM", date: "2024-10-23", patient: "Alice Brown", id: "capsule3" },
-    { content: "Capsule 4", time: "01:00 PM", date: "2024-10-24", patient: "Robert Johnson", id: "capsule4" },
-  ];
-  
-  const patients = [
-    { name: "John Doe", id: "john-doe" },
-    { name: "Jane Smith", id: "jane-smith" },
-    { name: "Alice Brown", id: "alice-brown" },
-    { name: "Robert Johnson", id: "robert-johnson" },
-  ];
 
   useEffect(() => {
     // Fetch capsule data based on the capsuleId from the URL
-    const capsule = capsules.find((capsule) => capsule.id === capsuleId);
-    if (capsule) {
-      setCapsuleData(capsule);
-      calculateRemainingTime(capsule.time); // Calculate the remaining time based on the capsule's time
-    }
+    const fetchCapsuleData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/capsules/${capsuleId}`); // Adjust URL for your API
+        if (!response.ok) {
+          throw new Error('Failed to fetch capsule data');
+        }
+        const data = await response.json();
+        setCapsuleData(data);
+        calculateRemainingTime(data.time); // Calculate the remaining time based on the capsule's time
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // Set loading to false when done
+      }
+    };
+
+    fetchCapsuleData(); // Call the fetch function
   }, [capsuleId]);
 
   // Function to calculate the remaining time
@@ -56,8 +54,12 @@ const CapsuleDetail = () => {
     setRemainingTime(`${String(hoursLeft).padStart(2, "0")}:${String(minutesLeft).padStart(2, "0")}`);
   };
 
+  if (loading) {
+    return <CircularProgress />; // Show loading spinner while fetching data
+  }
+
   if (!capsuleData) {
-    return <Typography variant="h5">Loading...</Typography>;
+    return <Typography variant="h5">Capsule not found</Typography>;
   }
 
   return (
@@ -109,16 +111,15 @@ const CapsuleDetail = () => {
                   Medications
                 </Typography>
                 {capsuleData.content}
-                  <Card sx={{ padding: 2, marginTop: 1 }}>
-                    <Typography variant="h6" color="primary">
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Type Medicament: 
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Number: 
-                    </Typography>
-                  </Card>
+                <Card sx={{ padding: 2, marginTop: 1 }}>
+                  <Typography variant="h6" color="primary"></Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Type Medicament:
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Number:
+                  </Typography>
+                </Card>
               </Box>
             </CardContent>
           </Card>
