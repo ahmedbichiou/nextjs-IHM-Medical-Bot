@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Box, Card, CardContent, Grid, Typography, Divider, CircularProgress, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { useEffect, useState } from 'react';
+import { URLPORT } from '../../URLPORT';
 
 const CapsuleDetail = () => {
   const pathname = usePathname();
@@ -17,7 +18,7 @@ const CapsuleDetail = () => {
     // Fetch capsule data based on the capsuleId from the URL
     const fetchCapsuleData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/capsules/${capsuleId}`); // Adjust URL for your API
+        const response = await fetch(URLPORT+`api/capsules/${capsuleId}`); // Adjust URL for your API
         if (!response.ok) {
           throw new Error('Failed to fetch capsule data');
         }
@@ -66,7 +67,7 @@ const CapsuleDetail = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/api/capsules`, {
+      const response = await fetch(URLPORT+`api/capsules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

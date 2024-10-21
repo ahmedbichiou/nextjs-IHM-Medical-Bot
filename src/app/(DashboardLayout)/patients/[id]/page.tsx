@@ -4,6 +4,7 @@ import { Typography, Button, Box } from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import { usePathname, useRouter } from 'next/navigation';
+import { URLPORT } from '../../URLPORT';
 
 
 const SamplePage = () => {
@@ -17,7 +18,7 @@ const SamplePage = () => {
 
     const fetchPatient = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/patients/${patientId}`); // Use the dynamic ID in the URL
+        const response = await fetch(URLPORT+`api/patients/${patientId}`); // Use the dynamic ID in the URL
         if (!response.ok) {
           throw new Error('Failed to fetch patient');
         }
@@ -34,7 +35,7 @@ const SamplePage = () => {
  
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/patients/${patientId}`, {
+      const response = await fetch(URLPORT+`api/patients/${patientId}`, {
         method: 'DELETE',
       });
 

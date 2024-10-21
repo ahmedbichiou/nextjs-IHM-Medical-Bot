@@ -6,6 +6,7 @@ import PageContainer from '@/app/(DashboardLayout)/components/container/PageCont
 import { useRouter } from 'next/navigation';
 import { Capsule } from './types'; // Ensure you have a Capsule type defined if needed
 import { Patient } from './types'; // Import the Patient type
+import { URLPORT } from './URLPORT';
 
 const Dashboard = () => {
   const [capsules, setCapsules] = useState<Capsule[]>([]); // State to hold fetched capsules
@@ -18,7 +19,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchCapsules = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/capsules'); // Adjust the URL if needed
+        const response = await fetch(URLPORT+'api/capsules'); // Adjust the URL if needed
         if (!response.ok) {
           throw new Error('Failed to fetch capsules');
         }
@@ -31,7 +32,7 @@ const Dashboard = () => {
 
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/patients'); // Adjust the URL if needed
+        const response = await fetch(URLPORT+'api/patients'); // Adjust the URL if needed
         if (!response.ok) {
           throw new Error('Failed to fetch patients');
         }

@@ -3,6 +3,7 @@ import { useState } from 'react'; // Import useState
 import { Button, TextField, Typography, Card, CardContent } from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { URLPORT } from '../URLPORT';
 
 const AddPatientPage = () => {
   const [name, setName] = useState('');
@@ -16,7 +17,7 @@ const AddPatientPage = () => {
     const patientData = { name, id, description };
 
     try {
-      const response = await fetch('http://localhost:5000/api/patients', {
+      const response = await fetch(URLPORT+'api/patients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

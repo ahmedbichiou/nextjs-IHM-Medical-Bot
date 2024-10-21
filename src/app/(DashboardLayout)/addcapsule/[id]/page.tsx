@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useRouter, usePathname } from 'next/navigation';
 import { Patient } from '../../types'; // Adjust the import path accordingly
+import { URLPORT } from '../../URLPORT';
 
 const AddCapsule = () => {
   const router = useRouter();
@@ -21,7 +22,7 @@ const AddCapsule = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/patients');
+        const response = await fetch(URLPORT+'api/patients');
         if (!response.ok) {
           throw new Error('Failed to fetch patients');
         }
@@ -46,7 +47,7 @@ const AddCapsule = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/capsules', {
+      const response = await fetch(URLPORT+'api/capsules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
