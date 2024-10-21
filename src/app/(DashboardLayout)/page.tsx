@@ -36,7 +36,12 @@ const Dashboard = () => {
   }, []); // Empty dependency array ensures this runs once on mount
 
   const handleCapsuleClick = (id: string) => {
-    router.push(`/capsules/${id}`); // Navigate to the dynamic capsule route
+    const capsule = capsules.find(capsule => capsule.id === id); // Find the clicked capsule
+    if (capsule && capsule.content) {
+      router.push(`/capsules/${id}`); // Navigate to the dynamic capsule route if content is non-empty
+    } else {
+      router.push(`/addcapsule/${id}`); // Navigate to add capsule route if content is empty
+    }
   };
 
   const handlePatientClick = (id: string) => {
@@ -62,7 +67,7 @@ const Dashboard = () => {
             >
               <CardContent>
                 <Grid container alignItems="center">
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <Typography variant="h5" gutterBottom>
                       Capsules List
                     </Typography>
@@ -70,43 +75,47 @@ const Dashboard = () => {
 
                   {/* Capsules Section */}
                   <Grid item xs={12} marginTop={2}>
-                    <Grid container spacing={2}>
-                      {capsules.map((capsule) => (
-                        <Grid item xs={6} key={capsule.id} style={{ display: 'flex' }}>
-                          <Card
-                            onClick={() => handleCapsuleClick(capsule.id)} // Handle click event
-                            sx={{
-                              flex: 1,
-                              borderRadius: '15px',
-                              boxShadow: 3,
-                              cursor: 'pointer',
-                              transition: '0.3s',
-                              '&:hover': {
-                                boxShadow: 6,
-                              },
-                              padding: '16px',
-                            }}
-                          >
-                            <CardContent>
-                              <Typography variant="h6" color="primary" gutterBottom>
-                                {capsule.content}
-                              </Typography>
-                              <Divider style={{ margin: '8px 0' }} />
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Time:</strong> {capsule.time}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Date:</strong> {capsule.date}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Patient:</strong> <br />{capsule.patient}
-                              </Typography>
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Grid>
+  <Grid container spacing={2}>
+    {capsules.map((capsule) => (
+      <Grid item xs={6} key={capsule.id}>
+        <Card
+          onClick={() => handleCapsuleClick(capsule.id)} // Handle click event
+          sx={{
+            flex: 1,
+            borderRadius: '15px',
+            boxShadow: 3,
+            cursor: 'pointer',
+            transition: '0.3s',
+            '&:hover': {
+              boxShadow: 6,
+            },
+            padding: '16px',
+            height: '200px', // Ensures all cards are the same height
+          }}
+        >
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Typography variant="h6" color="primary" gutterBottom>
+              {capsule.id} {/* Display ID at the top */}
+            </Typography>
+            <Typography variant="body1" color="textSecondary" marginBottom={1}>
+              {capsule.content} {/* Display content right under the ID */}
+            </Typography>
+            <Divider style={{ margin: '8px 0' }} />
+            <Typography variant="body2" color="textSecondary">
+              <strong>Time:</strong> {capsule.time}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              <strong>Date:</strong> {capsule.date}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              <strong>Patient:</strong> <br />{capsule.patient}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    ))}
+  </Grid>
+</Grid>
                   {/* Capsules Section END */}
                 </Grid>
               </CardContent>
