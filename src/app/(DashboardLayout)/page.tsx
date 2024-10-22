@@ -107,64 +107,70 @@ const Dashboard = () => {
                       ) : (
                         capsules.map((capsule, index) => (
                           <Grid item xs={6} key={capsule.id}>
-                            <Slide in={!loadingCapsules} direction="up" timeout={index * 200}>
-                              <Card
-                                onClick={() => handleCapsuleClick(capsule.id)}
-                                sx={{
-                                  flex: 1,
-                                  borderRadius: '15px',
-                                  boxShadow: 3,
-                                  cursor: 'pointer',
-                                  transition: '0.3s',
-                                  '&:hover': {
-                                    boxShadow: 6,
-                                  },
-                                  padding: '16px',
-                                  height: '200px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  textAlign: 'center',
-                                  backgroundColor: capsule.content ? '#e0f7fa' : 'white',
-                                }}
-                              >
-                                <CardContent
-                                  sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: '100%',
-                                    justifyContent: 'center',
-                                  }}
+                          <Slide in={!loadingCapsules} direction="up" timeout={index * 200}>
+                            <Card
+                              onClick={() => handleCapsuleClick(capsule.id)}
+                              sx={{
+                                flex: 1,
+                                borderRadius: '15px',
+                                boxShadow: 3,
+                                cursor: 'pointer',
+                                transition: '0.3s',
+                                '&:hover': {
+                                  boxShadow: 6,
+                                },
+                                padding: '16px',
+                                height: '200px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                textAlign: 'center',
+                                backgroundColor: capsule.content ? '#ff5252' : 'white', // red background color
+                              }}
+                            >
+                              <CardContent sx={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                {/* Capsule Number */}
+                                <Typography
+                                  variant="h1"
+                                  color="white"
+                                  sx={{ fontSize: '5rem', lineHeight: 1, textAlign: 'left', padding: '10px' }}
                                 >
-                                  <Typography variant="h6" color="primary" gutterBottom>
-                                    {capsule.id}
-                                  </Typography>
-                                  {capsule.content ? (
-                                    <>
-                                      <Typography variant="body1" color="textSecondary" marginBottom={1}>
-                                        {capsule.content}
-                                      </Typography>
-                                      <Divider style={{ margin: '8px 0' }} />
-                                      <Typography variant="body2" color="textSecondary">
-                                        <strong>Time:</strong> {capsule.time}
-                                      </Typography>
-                                      <Typography variant="body2" color="textSecondary">
-                                        <strong>Date:</strong> {capsule.date}
-                                      </Typography>
-                                      <Typography variant="body2" color="textSecondary">
-                                        <strong>Patient:</strong> <br />
-                                        {capsule.patient}
-                                      </Typography>
-                                    </>
-                                  ) : (
-                                    <Typography variant="body2" color="textSecondary">
-                                      Click to add
+                                  {index + 1}
+                                </Typography>
+                        
+                                {/* Capsule Details */}
+                                {capsule.content ? (
+                                  <>
+                                    <Typography variant="h6" color="white" gutterBottom>
+                                      {capsule.patient}
                                     </Typography>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            </Slide>
-                          </Grid>
+                                    <Button
+                                      sx={{
+                                        backgroundColor: 'white',
+                                        color: '#ff5252',
+                                        borderRadius: '20px',
+                                        padding: '5px 15px',
+                                        textTransform: 'none',
+                                        marginBottom: '5px',
+                                      }}
+                                    >
+                                      {capsule.content}
+                                    </Button>
+                                    <Divider sx={{ backgroundColor: 'white' }} />
+                                    <Typography variant="body2" color="white" sx={{ marginTop: '8px' }}>
+                                      {capsule.date} - {capsule.time}
+                                    </Typography>
+                                  </>
+                                ) : (
+                                  <Typography variant="body2" color="white">
+                                    Click to add
+                                  </Typography>
+                                )}
+                              </CardContent>
+                            </Card>
+                          </Slide>
+                        </Grid>
+                        
                         ))
                       )}
                     </Grid>
