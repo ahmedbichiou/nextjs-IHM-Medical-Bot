@@ -18,7 +18,7 @@ const CapsuleDetail = () => {
     // Fetch capsule data based on the capsuleId from the URL
     const fetchCapsuleData = async () => {
       try {
-        const response = await fetch(URLPORT+`api/capsules/${capsuleId}`); // Adjust URL for your API
+        const response = await fetch(URLPORT + `api/capsules/${capsuleId}`); // Adjust URL for your API
         if (!response.ok) {
           throw new Error('Failed to fetch capsule data');
         }
@@ -37,7 +37,7 @@ const CapsuleDetail = () => {
 
   // Function to calculate the remaining time
   const calculateRemainingTime = (capsuleTime: string) => {
-    const [capsuleHours, capsuleMinutes] = capsuleTime.split(":").map(Number);
+    const [capsuleHours, capsuleMinutes] = capsuleTime.split(':').map(Number);
     const now = new Date();
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
@@ -53,21 +53,21 @@ const CapsuleDetail = () => {
     const hoursLeft = Math.floor(remainingMinutes / 60);
     const minutesLeft = remainingMinutes % 60;
 
-    setRemainingTime(`${String(hoursLeft).padStart(2, "0")}:${String(minutesLeft).padStart(2, "0")}`);
+    setRemainingTime(`${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`);
   };
 
   // -------------------------
   const handleClearCapsule = async () => {
     const emptyCapsule = {
-      content: "",
-      time: "",
-      date: "",
-      patient: "",
+      content: '',
+      time: '',
+      date: '',
+      patient: '',
       id: capsuleId, // Set the id to the capsuleId from the URL
     };
 
     try {
-      const response = await fetch(URLPORT+`api/capsules`, {
+      const response = await fetch(URLPORT + `api/capsules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,6 @@ const CapsuleDetail = () => {
     } catch (error) {
       console.error(error);
     }
-
   };
   //-------------------------------
 
@@ -103,32 +102,67 @@ const CapsuleDetail = () => {
       <Grid container spacing={3}>
         {/* Capsule Content */}
         <Grid item xs={12}>
-          <Card sx={{ borderRadius: '15px', boxShadow: 3 }}>
+          <Card sx={{ borderRadius: '20px', boxShadow: 3 }}>
             <CardContent>
-            <Typography  margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
-  {capsuleId}
-</Typography>
-              <Typography variant="body1" color="textSecondary">
-                 Delivery Time for {capsuleData.content}
+              <Typography margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
+                {capsuleId}
               </Typography>
-              <Divider />
+            
+           
               {/* Delivery Time Section */}
               <Grid container spacing={2} marginTop={2}>
                 <Grid item xs={6}>
-                  <Card sx={{ padding: 2, textAlign: 'center' }}>
+                  <Card
+                    sx={{
+                      padding: 2,
+                      textAlign: 'center',
+                      height: '180px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      borderRadius: '20px',
+                    }}
+                  >
                     <Typography variant="body2" color="textSecondary">
                       Time remaining
                     </Typography>
-                    <CircularProgress variant="determinate" value={80} size={80} />
-                    <Typography variant="h6">{remainingTime}</Typography>
+                    <Box position="relative" display="inline-flex" alignItems="center" justifyContent="center">
+                      <CircularProgress variant="determinate" value={80} size={120} thickness={4} />
+                      <Box
+                        sx={{
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          position: 'absolute',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography variant="h4" component="div" color="textPrimary">
+                          {remainingTime}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Card>
                 </Grid>
                 <Grid item xs={6}>
-                  <Card sx={{ padding: 2, textAlign: 'center' }}>
+                  <Card
+                    sx={{
+                      padding: 2,
+                      textAlign: 'center',
+                      height: '180px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      borderRadius: '20px',
+                    }}
+                  >
                     <Typography variant="body2" color="textSecondary">
-                      Time
+                      Scheduled Time
                     </Typography>
-                    <Typography variant="h6" color="error">
+                    <Typography variant="h4" color="error">
                       {capsuleData.time}
                     </Typography>
                   </Card>
@@ -139,7 +173,7 @@ const CapsuleDetail = () => {
                 <Typography variant="body1" color="textSecondary">
                   Patient
                 </Typography>
-                <Card sx={{ padding: 2, display: 'flex', alignItems: 'center' }}>
+                <Card sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '20px' }}>
                   <PersonIcon sx={{ marginRight: 2, color: 'primary.main' }} />
                   <Typography variant="h6">{capsuleData.patient}</Typography>
                 </Card>
@@ -149,8 +183,7 @@ const CapsuleDetail = () => {
                 <Typography variant="body1" color="textSecondary">
                   Medications
                 </Typography>
-                <Card sx={{ padding: 2, marginTop: 1 }}>
-                  <Typography variant="h6" color="primary"></Typography>
+                <Card sx={{ padding: 2, marginTop: 1, borderRadius: '20px' }}>
                   <Typography variant="body2" color="textSecondary">
                     Type Medicament: {capsuleData.content}
                   </Typography>
@@ -158,7 +191,7 @@ const CapsuleDetail = () => {
               </Box>
               {/* Vider la capsule Button */}
               <Box marginTop={4} display="flex" justifyContent="center">
-                <Button variant="contained" color="secondary" onClick={handleClearCapsule}>
+                <Button variant="contained" color="secondary" onClick={handleClearCapsule} fullWidth>
                   Vider la capsule
                 </Button>
               </Box>

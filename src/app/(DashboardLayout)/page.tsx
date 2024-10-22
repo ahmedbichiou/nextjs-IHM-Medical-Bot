@@ -1,63 +1,72 @@
 'use client';
-import { useEffect, useState } from 'react'; // Import useState and useEffect
-import { Grid, Box, Card, CardContent, Typography, Divider, Button } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Grid, Box, Card, CardContent, Typography, Divider, Button, Slide, Skeleton, Fade } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import AddIcon from '@mui/icons-material/Add';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import { useRouter } from 'next/navigation';
-import { Capsule } from './types'; // Ensure you have a Capsule type defined if needed
-import { Patient } from './types'; // Import the Patient type
+import { Capsule } from './types';
+import { Patient } from './types';
 import { URLPORT } from './URLPORT';
 
 const Dashboard = () => {
-  const [capsules, setCapsules] = useState<Capsule[]>([]); // State to hold fetched capsules
-  const [patients, setPatients] = useState<Patient[]>([]); // State to hold fetched patients
+  const [capsules, setCapsules] = useState<Capsule[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loadingCapsules, setLoadingCapsules] = useState<boolean>(true); // Loading state for capsules
+  const [loadingPatients, setLoadingPatients] = useState<boolean>(true);  // Loading state for patients
   const router = useRouter();
+
   const handleAddPatient = () => {
-    router.push('/addpatient'); // Navigate to the Add Patient page
+    router.push('/addpatient');
   };
-  // Fetch capsules from the API when the component mounts
+
+  // Fetch capsules and patients from the API
   useEffect(() => {
     const fetchCapsules = async () => {
       try {
-        const response = await fetch(URLPORT+'api/capsules'); // Adjust the URL if needed
+        const response = await fetch(URLPORT + 'api/capsules');
         if (!response.ok) {
           throw new Error('Failed to fetch capsules');
         }
-        const data: Capsule[] = await response.json(); // Parse the JSON response
-        setCapsules(data); // Set the fetched capsules to state
+        const data: Capsule[] = await response.json();
+        setCapsules(data);
       } catch (error) {
-        console.error('Error fetching capsules:', error); // Handle error
+        console.error('Error fetching capsules:', error);
+      } finally {
+        setLoadingCapsules(false); // Stop loading after data is fetched
       }
     };
 
     const fetchPatients = async () => {
       try {
-        const response = await fetch(URLPORT+'api/patients'); // Adjust the URL if needed
+        const response = await fetch(URLPORT + 'api/patients');
         if (!response.ok) {
           throw new Error('Failed to fetch patients');
         }
-        const data: Patient[] = await response.json(); // Parse the JSON response
-        setPatients(data); // Set the fetched patients to state
+        const data: Patient[] = await response.json();
+        setPatients(data);
       } catch (error) {
-        console.error('Error fetching patients:', error); // Handle error
+        console.error('Error fetching patients:', error);
+      } finally {
+        setLoadingPatients(false); // Stop loading after data is fetched
       }
     };
 
-    fetchCapsules(); // Call the fetch function for capsules
-    fetchPatients(); // Call the fetch function for patients
-  }, []); // Empty dependency array ensures this runs once on mount
+    fetchCapsules();
+    fetchPatients();
+  }, []);
 
   const handleCapsuleClick = (id: string) => {
-    const capsule = capsules.find(capsule => capsule.id === id); // Find the clicked capsule
+    const capsule = capsules.find((capsule) => capsule.id === id);
     if (capsule && capsule.content) {
-      router.push(`/capsules/${id}`); // Navigate to the dynamic capsule route if content is non-empty
+      router.push(`/capsules/${id}`);
     } else {
-      router.push(`/addcapsule/${id}`); // Navigate to add capsule route if content is empty
+      router.push(`/addcapsule/${id}`);
     }
   };
 
   const handlePatientClick = (id: string) => {
-    router.push(`/patients/${id}`); // Navigate to the dynamic patient route
+    router.push(`/patients/${id}`);
   };
 
   return (
@@ -88,44 +97,76 @@ const Dashboard = () => {
                   {/* Capsules Section */}
                   <Grid item xs={12} marginTop={2}>
                     <Grid container spacing={2}>
-                      {capsules.map((capsule) => (
-                        <Grid item xs={6} key={capsule.id}>
-                          <Card
-                            onClick={() => handleCapsuleClick(capsule.id)} // Handle click event
-                            sx={{
-                              flex: 1,
-                              borderRadius: '15px',
-                              boxShadow: 3,
-                              cursor: 'pointer',
-                              transition: '0.3s',
-                              '&:hover': {
-                                boxShadow: 6,
-                              },
-                              padding: '16px',
-                              height: '200px', // Ensures all cards are the same height
-                            }}
-                          >
-                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                              <Typography variant="h6" color="primary" gutterBottom>
-                                {capsule.id} {/* Display ID at the top */}
-                              </Typography>
-                              <Typography variant="body1" color="textSecondary" marginBottom={1}>
-                                {capsule.content} {/* Display content right under the ID */}
-                              </Typography>
-                              <Divider style={{ margin: '8px 0' }} />
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Time:</strong> {capsule.time}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Date:</strong> {capsule.date}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                <strong>Patient:</strong> <br />{capsule.patient}
-                              </Typography>
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      ))}
+                      {loadingCapsules ? (
+                        // Show loading skeleton while fetching capsules
+                        Array.from(new Array(4)).map((_, index) => (
+                          <Grid item xs={6} key={index}>
+                            <Skeleton variant="rectangular" height={200} animation="wave" />
+                          </Grid>
+                        ))
+                      ) : (
+                        capsules.map((capsule, index) => (
+                          <Grid item xs={6} key={capsule.id}>
+                            <Slide in={!loadingCapsules} direction="up" timeout={index * 200}>
+                              <Card
+                                onClick={() => handleCapsuleClick(capsule.id)}
+                                sx={{
+                                  flex: 1,
+                                  borderRadius: '15px',
+                                  boxShadow: 3,
+                                  cursor: 'pointer',
+                                  transition: '0.3s',
+                                  '&:hover': {
+                                    boxShadow: 6,
+                                  },
+                                  padding: '16px',
+                                  height: '200px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  textAlign: 'center',
+                                  backgroundColor: capsule.content ? '#e0f7fa' : 'white',
+                                }}
+                              >
+                                <CardContent
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Typography variant="h6" color="primary" gutterBottom>
+                                    {capsule.id}
+                                  </Typography>
+                                  {capsule.content ? (
+                                    <>
+                                      <Typography variant="body1" color="textSecondary" marginBottom={1}>
+                                        {capsule.content}
+                                      </Typography>
+                                      <Divider style={{ margin: '8px 0' }} />
+                                      <Typography variant="body2" color="textSecondary">
+                                        <strong>Time:</strong> {capsule.time}
+                                      </Typography>
+                                      <Typography variant="body2" color="textSecondary">
+                                        <strong>Date:</strong> {capsule.date}
+                                      </Typography>
+                                      <Typography variant="body2" color="textSecondary">
+                                        <strong>Patient:</strong> <br />
+                                        {capsule.patient}
+                                      </Typography>
+                                    </>
+                                  ) : (
+                                    <Typography variant="body2" color="textSecondary">
+                                      Click to add
+                                    </Typography>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            </Slide>
+                          </Grid>
+                        ))
+                      )}
                     </Grid>
                   </Grid>
                   {/* Capsules Section END */}
@@ -136,59 +177,65 @@ const Dashboard = () => {
 
           {/* Patients List Section */}
           <Grid item xs={12}>
-            <Card
-              sx={{
-                borderRadius: '15px',
-                boxShadow: 3,
-                padding: '16px',
-              }}
-            >
+            <Card sx={{ borderRadius: '15px', boxShadow: 3, padding: '16px' }}>
               <CardContent>
-                <Grid container spacing={3}>   
-              <Grid item xs={8}>
-                <Typography variant="h5" gutterBottom>
-                  Patient List
-                </Typography></Grid>
-                <Grid item xs={4}>
-                <Button
-                  sx={{ mt: -1, borderRadius: '15px' }} // Added borderRadius for rounded corners
-                  variant="contained"
-                  onClick={handleAddPatient}
-                  color="primary" // You can change the color as needed
-                >
-                  Add
-                </Button></Grid>
-                {/* Patients List Section */}
-                <Grid item xs={12}>
-                  <Grid container spacing={2} marginTop={1}>
-                    {patients.map((patient) => (
-                      <Grid item xs={12} key={patient.id}> {/* Use patient.id instead of index */}
-                        <Card
-                          onClick={() => handlePatientClick(patient.id)} // Handle click event
-                          sx={{
-                            borderRadius: '15px',
-                            boxShadow: 2,
-                            cursor: 'pointer',
-                            transition: '0.3s',
-                            '&:hover': {
-                              boxShadow: 4,
-                            },
-                            padding: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <PersonIcon sx={{ marginRight: 2 }} />
-                          <CardContent>
-                            <Typography variant="body1" color="primary">
-                              {patient.name}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
+                <Grid container justifyContent="space-between" alignItems="center">
+                  <Typography variant="h5">Patient List</Typography>
+                  <Fade in={!loadingPatients} timeout={500}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      onClick={handleAddPatient}
+                      sx={{
+                        borderRadius: '50px',
+                        textTransform: 'none',
+                        transition: '0.3s',
+                        '&:hover': {
+                          boxShadow: 6,
+                        },
+                      }}
+                    >
+                      Add Patient
+                    </Button>
+                  </Fade>
                 </Grid>
+                <Grid container spacing={2} marginTop={2}>
+                  {loadingPatients ? (
+                    Array.from(new Array(4)).map((_, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Skeleton variant="rectangular" height={100} animation="wave" />
+                      </Grid>
+                    ))
+                  ) : (
+                    patients.map((patient, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={patient.id}>
+                        <Slide in={!loadingPatients} direction="left" timeout={index * 200}>
+                          <Card
+                            onClick={() => handlePatientClick(patient.id)}
+                            sx={{
+                              borderRadius: '15px',
+                              boxShadow: 3,
+                              padding: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              transition: '0.3s',
+                              '&:hover': {
+                                boxShadow: 6,
+                              },
+                            }}
+                          >
+                            <PersonIcon sx={{ marginRight: 2, color: 'primary.main' }} />
+                            <CardContent>
+                              <Typography variant="body1" color="primary">
+                                {patient.name}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Slide>
+                      </Grid>
+                    ))
+                  )}
                 </Grid>
               </CardContent>
             </Card>
