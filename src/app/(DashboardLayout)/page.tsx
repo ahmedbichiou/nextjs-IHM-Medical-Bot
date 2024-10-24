@@ -123,17 +123,27 @@ const Dashboard = () => {
                                 height: '200px',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                justifyContent: 'space-between',
+                                justifyContent: 'center',  // Center the number for empty capsules
+                                alignItems: 'center',
                                 textAlign: 'center',
-                                backgroundColor: capsule.content ? '#ff5252' : 'white', // red background color
+                                backgroundColor: capsule.content ? '#ff5252' : 'white', // red background for capsules with content
                               }}
                             >
-                              <CardContent sx={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                              <CardContent
+                                sx={{
+                                  padding: 0,
+                                  flex: 1,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'center',  // Ensure the number is centered
+                                  alignItems: 'center',
+                                }}
+                              >
                                 {/* Capsule Number */}
                                 <Typography
                                   variant="h1"
-                                  color="white"
-                                  sx={{ fontSize: '5rem', lineHeight: 1, textAlign: 'left', padding: '10px' }}
+                                  color={capsule.content ? 'white' : 'black'} // Black text for empty capsules
+                                  sx={{ fontSize: '5rem', lineHeight: 1, padding: '10px' }}
                                 >
                                   {index + 1}
                                 </Typography>
@@ -161,15 +171,12 @@ const Dashboard = () => {
                                       {capsule.date} - {capsule.time}
                                     </Typography>
                                   </>
-                                ) : (
-                                  <Typography variant="body2" color="white">
-                                    Click to add
-                                  </Typography>
-                                )}
+                                ) : null} {/* Don't show anything else for empty capsules */}
                               </CardContent>
                             </Card>
                           </Slide>
                         </Grid>
+                        
                         
                         ))
                       )}
