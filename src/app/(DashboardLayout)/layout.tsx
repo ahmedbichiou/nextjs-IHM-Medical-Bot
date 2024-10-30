@@ -34,11 +34,7 @@ export default function RootLayout({
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   return (
     <MainWrapper className="mainwrapper">
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        isMobileSidebarOpen={isMobileSidebarOpen}
-        onSidebarClose={() => setMobileSidebarOpen(false)}
-      />
+  
       <PageWrapper className="page-wrapper">
         <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
         <Container

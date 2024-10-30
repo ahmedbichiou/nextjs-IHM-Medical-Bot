@@ -12,49 +12,13 @@ import { URLPORT } from './URLPORT';
 const Dashboard = () => {
   const [capsules, setCapsules] = useState<Capsule[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [loadingCapsules, setLoadingCapsules] = useState<boolean>(true); // Loading state for capsules
-  const [loadingPatients, setLoadingPatients] = useState<boolean>(true);  // Loading state for patients
+  const [loadingCapsules, setLoadingCapsules] = useState<boolean>(true);
+  const [loadingPatients, setLoadingPatients] = useState<boolean>(true);
   const router = useRouter();
 
   const handleAddPatient = () => {
     router.push('/addpatient');
   };
-
-  // Fetch capsules and patients from the API
-  useEffect(() => {
-    const fetchCapsules = async () => {
-      try {
-        const response = await fetch(URLPORT + 'api/capsules');
-        if (!response.ok) {
-          throw new Error('Failed to fetch capsules');
-        }
-        const data: Capsule[] = await response.json();
-        setCapsules(data);
-      } catch (error) {
-        console.error('Error fetching capsules:', error);
-      } finally {
-        setLoadingCapsules(false); // Stop loading after data is fetched
-      }
-    };
-
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(URLPORT + 'api/patients');
-        if (!response.ok) {
-          throw new Error('Failed to fetch patients');
-        }
-        const data: Patient[] = await response.json();
-        setPatients(data);
-      } catch (error) {
-        console.error('Error fetching patients:', error);
-      } finally {
-        setLoadingPatients(false); // Stop loading after data is fetched
-      }
-    };
-
-    fetchCapsules();
-    fetchPatients();
-  }, []);
 
   const handleCapsuleClick = (id: string) => {
     const capsule = capsules.find((capsule) => capsule.id === id);
@@ -69,12 +33,61 @@ const Dashboard = () => {
     router.push(`/patients/${id}`);
   };
 
+  useEffect(() => {
+    const fetchCapsules = async () => {
+      try {
+        const response = await fetch(URLPORT + 'api/capsules');
+        if (!response.ok) {
+          throw new Error('Failed to fetch capsules');
+        }
+        const data: Capsule[] = await response.json();
+        setCapsules(data);
+      } catch (error) {
+        console.error('Error fetching capsules:', error);
+      } finally {
+        setLoadingCapsules(false);
+      }
+    };
+
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch(URLPORT + 'api/patients');
+        if (!response.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        const data: Patient[] = await response.json();
+        setPatients(data);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      } finally {
+        setLoadingPatients(false);
+      }
+    };
+
+    fetchCapsules();
+    fetchPatients();
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = parseInt(event.key, 10);
+      if (!isNaN(key) && key > 0 && key <= capsules.length) {
+        // Select the capsule corresponding to the number pressed
+        handleCapsuleClick(capsules[key - 1].id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [capsules]);
+
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
       <Box>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Card
+              aria-labelledby="capsules-list-heading"
               sx={{
                 flex: 1,
                 borderRadius: '15px',
@@ -89,7 +102,7 @@ const Dashboard = () => {
               <CardContent>
                 <Grid container alignItems="center">
                   <Grid item xs={6}>
-                    <Typography variant="h5" gutterBottom>
+                    <Typography id="capsules-list-heading" variant="h5" gutterBottom>
                       Capsules List
                     </Typography>
                   </Grid>
@@ -98,91 +111,89 @@ const Dashboard = () => {
                   <Grid item xs={12} marginTop={2}>
                     <Grid container spacing={2}>
                       {loadingCapsules ? (
-                        // Show loading skeleton while fetching capsules
                         Array.from(new Array(4)).map((_, index) => (
                           <Grid item xs={6} key={index}>
-                            <Skeleton variant="rectangular" height={200} animation="wave" />
+                            <Skeleton variant="rectangular" height={200} animation="wave" aria-busy="true" aria-label="Loading capsule data" />
                           </Grid>
                         ))
                       ) : (
                         capsules.map((capsule, index) => (
                           <Grid item xs={6} key={capsule.id}>
-                          <Slide in={!loadingCapsules} direction="up" timeout={index * 200}>
-                            <Card
-                              onClick={() => handleCapsuleClick(capsule.id)}
-                              sx={{
-                                flex: 1,
-                                borderRadius: '15px',
-                                boxShadow: 3,
-                                cursor: 'pointer',
-                                transition: '0.3s',
-                                '&:hover': {
-                                  boxShadow: 6,
-                                },
-                                padding: '16px',
-                                height: '200px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',  // Center the number for empty capsules
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                backgroundColor: capsule.content ? '#ff5252' : 'white', // red background for capsules with content
-                              }}
-                            >
-                              <CardContent
+                            <Slide in={!loadingCapsules} direction="up" timeout={index * 200}>
+                              <Card
+                                onClick={() => handleCapsuleClick(capsule.id)}
+                                tabIndex={0}
+                                role="button"
+                                aria-label={`Capsule ${index + 1}, ${capsule.content ? 'occupied' : 'empty'}`}
                                 sx={{
-                                  padding: 0,
                                   flex: 1,
+                                  borderRadius: '15px',
+                                  boxShadow: 3,
+                                  cursor: 'pointer',
+                                  transition: '0.3s',
+                                  '&:hover': {
+                                    boxShadow: 6,
+                                  },
+                                  padding: '16px',
+                                  height: '200px',
                                   display: 'flex',
                                   flexDirection: 'column',
-                                  justifyContent: 'center',  // Ensure the number is centered
+                                  justifyContent: 'center',
                                   alignItems: 'center',
+                                  textAlign: 'center',
+                                  backgroundColor: capsule.content ? '#ff5252' : 'white',
                                 }}
                               >
-                                {/* Capsule Number */}
-                                <Typography
-                                  variant="h1"
-                                  color={capsule.content ? 'white' : 'black'} // Black text for empty capsules
-                                  sx={{ fontSize: '5rem', lineHeight: 1, padding: '10px' }}
+                                <CardContent
+                                  sx={{
+                                    padding: 0,
+                                    flex: 1,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                  }}
                                 >
-                                  {index + 1}
-                                </Typography>
-                        
-                                {/* Capsule Details */}
-                                {capsule.content ? (
-                                  <>
-                                    <Typography variant="h6" color="white" gutterBottom>
-                                      {capsule.patient}
-                                    </Typography>
-                                    <Button
-                                      sx={{
-                                        backgroundColor: 'white',
-                                        color: '#ff5252',
-                                        borderRadius: '20px',
-                                        padding: '5px 15px',
-                                        textTransform: 'none',
-                                        marginBottom: '5px',
-                                      }}
-                                    >
-                                      {capsule.content}
-                                    </Button>
-                                    <Divider sx={{ backgroundColor: 'white' }} />
-                                    <Typography variant="body2" color="white" sx={{ marginTop: '8px' }}>
-                                      {capsule.date} - {capsule.time}
-                                    </Typography>
-                                  </>
-                                ) : null} {/* Don't show anything else for empty capsules */}
-                              </CardContent>
-                            </Card>
-                          </Slide>
-                        </Grid>
-                        
-                        
+                                  <Typography
+                                    variant="h1"
+                                    color={capsule.content ? 'white' : 'black'}
+                                    sx={{ fontSize: '5rem', lineHeight: 1, padding: '10px' }}
+                                  >
+                                    {index + 1}
+                                  </Typography>
+
+                                  {capsule.content ? (
+                                    <>
+                                      <Typography variant="h6" color="white" gutterBottom>
+                                        {capsule.patient}
+                                      </Typography>
+                                      <Button
+                                        aria-label={`View details for capsule ${index + 1}`}
+                                        sx={{
+                                          backgroundColor: 'white',
+                                          color: '#ff5252',
+                                          borderRadius: '20px',
+                                          padding: '5px 15px',
+                                          textTransform: 'none',
+                                          marginBottom: '5px',
+                                        }}
+                                      >
+                                        {capsule.content}
+                                      </Button>
+                                      <Divider sx={{ backgroundColor: 'white' }} />
+                                      <Typography variant="body2" color="white" sx={{ marginTop: '8px' }}>
+                                        {capsule.date} - {capsule.time}
+                                      </Typography>
+                                    </>
+                                  ) : null}
+                                </CardContent>
+                              </Card>
+                            </Slide>
+                          </Grid>
                         ))
                       )}
                     </Grid>
                   </Grid>
-                  {/* Capsules Section END */}
                 </Grid>
               </CardContent>
             </Card>
@@ -193,9 +204,10 @@ const Dashboard = () => {
             <Card sx={{ borderRadius: '15px', boxShadow: 3, padding: '16px' }}>
               <CardContent>
                 <Grid container justifyContent="space-between" alignItems="center">
-                  <Typography variant="h5">Patient List</Typography>
+                  <Typography id="patients-list-heading" variant="h5">Patient List</Typography>
                   <Fade in={!loadingPatients} timeout={500}>
                     <Button
+                      aria-labelledby="add-patient-button"
                       variant="contained"
                       color="primary"
                       startIcon={<AddIcon />}
@@ -217,7 +229,7 @@ const Dashboard = () => {
                   {loadingPatients ? (
                     Array.from(new Array(4)).map((_, index) => (
                       <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Skeleton variant="rectangular" height={100} animation="wave" />
+                        <Skeleton variant="rectangular" height={100} animation="wave" aria-busy="true" aria-label="Loading patient data" />
                       </Grid>
                     ))
                   ) : (
@@ -226,6 +238,9 @@ const Dashboard = () => {
                         <Slide in={!loadingPatients} direction="left" timeout={index * 200}>
                           <Card
                             onClick={() => handlePatientClick(patient.id)}
+                            tabIndex={0}
+                            role="button"
+                            aria-label={`Patient ${patient.name}`}
                             sx={{
                               borderRadius: '15px',
                               boxShadow: 3,
