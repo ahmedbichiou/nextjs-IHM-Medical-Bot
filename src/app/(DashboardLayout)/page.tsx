@@ -20,6 +20,18 @@ const Dashboard = () => {
   const handleAddPatient = () => {
     router.push('/addpatient');
   };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      // If no token is found, redirect to the login page
+      router.push('/authentication/login');
+    } else {
+      // Optionally, you can also decode the token to verify its validity and user role
+      // Example: jwt_decode(token)
+      // If the token is invalid or expired, you can also redirect to the login page
+    }
+  }, [router]);
 
   const handleDisconnect = () => {
     // Implement your disconnect logic here
