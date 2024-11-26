@@ -23,6 +23,7 @@
     "apexcharts": "3.41.1",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
+    "framer-motion": "^11.11.17",
     "lodash": "4.17.21",
     "next": "14.2.3",
     "react": "18.2.0",

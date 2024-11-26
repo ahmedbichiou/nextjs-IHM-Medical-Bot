@@ -29,17 +29,17 @@ const CapsuleDetail = () => {
     // Fetch capsule data based on the capsuleId from the URL
     const fetchCapsuleData = async () => {
       try {
-        const response = await fetch(URLPORT + `api/capsules/${capsuleId}`); // Adjust URL for your API
+        const response = await fetch(URLPORT + `api/capsules/${capsuleId}`); 
         if (!response.ok) {
           throw new Error('Failed to fetch capsule data');
         }
         const data = await response.json();
         setCapsuleData(data);
-        calculateRemainingTime(data.time); // Calculate the remaining time based on the capsule's time
+        calculateRemainingTime(data.time); 
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Set loading to false when done
+        setLoading(false); 
       }
     };
 
