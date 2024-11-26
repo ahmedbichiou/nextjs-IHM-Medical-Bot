@@ -109,7 +109,20 @@ const CapsuleDetail = () => {
   }
 
   return (
-    <Box>
+    <Box
+    sx={{
+    backgroundImage: 'url(/app.jpeg)', // Reference the image from the public folder
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+
+    display: 'flex',
+
+    alignItems: 'center',
+    padding: '10px',
+    borderRadius: '16px', // Add rounded corners
+    
+    }}
+  >
       <Grid container spacing={3}>
         {/* Capsule Content */}
         <Grid item xs={12}>
@@ -144,7 +157,7 @@ const CapsuleDetail = () => {
                           top: 0,
                           left: 0,
                           bottom: 0,
-                          right: 0,
+                          right: 10,
                           position: 'absolute',
                           display: 'flex',
                           alignItems: 'center',
@@ -202,7 +215,8 @@ const CapsuleDetail = () => {
               </Box>
               {/* Vider la capsule Button */}
               <Box marginTop={4} display="flex" justifyContent="center">
-                <Button variant="contained" color="secondary" onClick={handleClearCapsule} fullWidth>
+                <Button variant="contained" color="secondary" onClick={handleClearCapsule} fullWidth
+                sx={{ marginTop: 2, width: '100%', boxShadow: 3, borderRadius: '15px' }}>
                   Vider la capsule
                 </Button>
               </Box>

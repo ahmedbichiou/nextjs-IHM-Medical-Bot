@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react'; // Import useState
-import { Button, TextField, Typography, Card, CardContent } from '@mui/material';
+import { Button, TextField, Typography, Card, CardContent, Box } from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import { useRouter } from 'next/navigation'; // Import useRouter
 import { URLPORT } from '../URLPORT';
@@ -17,7 +17,7 @@ const AddPatientPage = () => {
     const patientData = { name, id, description };
 
     try {
-      const response = await fetch(URLPORT+'api/patients', {
+      const response = await fetch(URLPORT + 'api/patients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,8 +43,21 @@ const AddPatientPage = () => {
   };
 
   return (
-    <PageContainer>
-      <Card elevation={3} sx={{ borderRadius: 2, padding: 2 }}>
+    <Box
+      sx={{
+        backgroundImage: 'url(/app.jpeg)', // Reference the image from the public folder
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      height: '100vh', // Full viewport height
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '20px',
+      borderRadius: '16px', // Add rounded corners
+      overflow: 'hidden', // Ensure the corners are rounded by hiding overflow
+      }}
+    >
+      <Card elevation={3} sx={{ borderRadius: 2, padding: 2, maxWidth: 600, width: '100%' }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             Add Patient
@@ -93,7 +106,7 @@ const AddPatientPage = () => {
           </form>
         </CardContent>
       </Card>
-    </PageContainer>
+    </Box>
   );
 };
 
