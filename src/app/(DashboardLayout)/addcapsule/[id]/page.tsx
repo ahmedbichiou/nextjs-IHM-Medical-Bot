@@ -22,7 +22,7 @@ const AddCapsule = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch(URLPORT+'api/patients');
+        const response = await fetch(URLPORT + 'api/patients');
         if (!response.ok) {
           throw new Error('Failed to fetch patients');
         }
@@ -47,7 +47,7 @@ const AddCapsule = () => {
     };
 
     try {
-      const response = await fetch(URLPORT+'api/capsules', {
+      const response = await fetch(URLPORT + 'api/capsules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,8 +59,8 @@ const AddCapsule = () => {
         throw new Error('Failed to add capsule');
       }
 
-      // Redirect to the root after successful submission
-      router.push('/'); // Navigate to the root page
+      // Redirect to /remplir after successful submission
+      router.push('/remplir'); // Navigate to the /remplir page
     } catch (error) {
       console.error(error);
       // Handle error (e.g., show a message)
@@ -68,8 +68,20 @@ const AddCapsule = () => {
   };
 
   return (
-    <Box>
-      <Card sx={{ borderRadius: '15px', boxShadow: 3, width: '100%' }}>
+    <Box
+      sx={{
+        backgroundImage: 'url(/app.jpeg)', // Reference the image from the public folder
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh', // Cover the full viewport height
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+        borderRadius: '15px', // Make the edges rounded
+      }}
+    >
+      <Card sx={{ borderRadius: '15px', boxShadow: 3, width: '100%', maxWidth: 600 }}>
         <CardContent>
           <Typography margin={5} variant="h2" gutterBottom sx={{ textAlign: 'center' }}>
             {capsuleId}
@@ -129,7 +141,7 @@ const AddCapsule = () => {
               type="submit"
               variant="contained"
               color="primary"
-              sx={{ marginTop: 2 }}
+              sx={{ marginTop: 2, width: '100%', boxShadow: 3, borderRadius: '15px' }}
             >
               Add Capsule
             </Button>

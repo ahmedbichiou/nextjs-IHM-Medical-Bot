@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Grid, Box, Card, CardContent, Typography, Divider, Button, Slide, Skeleton, Fade } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import { useRouter } from 'next/navigation';
 import { Capsule } from './types';
@@ -20,6 +21,12 @@ const Dashboard = () => {
     router.push('/addpatient');
   };
 
+  const handleDisconnect = () => {
+    // Implement your disconnect logic here
+    console.log("Disconnected");
+    // For example, you could navigate the user to a logout page or clear session data
+  };
+
   const handleCapsuleClick = (id: string) => {
     const capsule = capsules.find((capsule) => capsule.id === id);
     if (capsule && capsule.content) {
@@ -31,6 +38,14 @@ const Dashboard = () => {
 
   const handlePatientClick = (id: string) => {
     router.push(`/patients/${id}`);
+  };
+
+  const getColorBasedOnName = (name: string) => {
+    const firstLetter = name.charAt(0).toLowerCase(); // Convert first letter to lowercase
+    if (firstLetter === 'a') return '#4CAF50'; // Green for names starting with 'A' or 'a'
+    if (firstLetter === 'm') return '#f44336'; // Red for names starting with 'M' or 'm'
+    if (firstLetter === 'n') return '#FFEB3B'; // Yellow for names starting with 'N' or 'n'
+    return '#2196F3'; // Default Blue
   };
 
   useEffect(() => {
@@ -68,22 +83,23 @@ const Dashboard = () => {
     fetchPatients();
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = parseInt(event.key, 10);
-      if (!isNaN(key) && key > 0 && key <= capsules.length) {
-        // Select the capsule corresponding to the number pressed
-        handleCapsuleClick(capsules[key - 1].id);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [capsules]);
-
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
-      <Box>
+       <Box
+      sx={{
+        
+      backgroundImage: 'url(/app.jpeg)', // Reference the image from the public folder
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+  
+      display: 'flex',
+
+      alignItems: 'center',
+      padding: '10px',
+      borderRadius: '16px', // Add rounded corners
+      
+      }}
+    >
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Card
@@ -113,7 +129,7 @@ const Dashboard = () => {
                       {loadingCapsules ? (
                         Array.from(new Array(4)).map((_, index) => (
                           <Grid item xs={6} key={index}>
-                            <Skeleton variant="rectangular" height={200} animation="wave" aria-busy="true" aria-label="Loading capsule data" />
+                            <Skeleton variant="rectangular" height={200} animation="wave" />
                           </Grid>
                         ))
                       ) : (
@@ -124,16 +140,11 @@ const Dashboard = () => {
                                 onClick={() => handleCapsuleClick(capsule.id)}
                                 tabIndex={0}
                                 role="button"
-                                aria-label={`Capsule ${index + 1}, ${capsule.content ? 'occupied' : 'empty'}`}
                                 sx={{
-                                  flex: 1,
                                   borderRadius: '15px',
                                   boxShadow: 3,
                                   cursor: 'pointer',
                                   transition: '0.3s',
-                                  '&:hover': {
-                                    boxShadow: 6,
-                                  },
                                   padding: '16px',
                                   height: '200px',
                                   display: 'flex',
@@ -141,37 +152,25 @@ const Dashboard = () => {
                                   justifyContent: 'center',
                                   alignItems: 'center',
                                   textAlign: 'center',
-                                  backgroundColor: capsule.content ? '#ff5252' : 'white',
+                                  backgroundColor: getColorBasedOnName(capsule.patient),
                                 }}
                               >
-                                <CardContent
-                                  sx={{
-                                    padding: 0,
-                                    flex: 1,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                  }}
-                                >
+                                <CardContent>
                                   <Typography
                                     variant="h1"
-                                    color={capsule.content ? 'white' : 'black'}
                                     sx={{ fontSize: '5rem', lineHeight: 1, padding: '10px' }}
                                   >
                                     {index + 1}
                                   </Typography>
-
                                   {capsule.content ? (
                                     <>
-                                      <Typography variant="h6" color="white" gutterBottom>
+                                      <Typography variant="h6" gutterBottom>
                                         {capsule.patient}
                                       </Typography>
                                       <Button
-                                        aria-label={`View details for capsule ${index + 1}`}
                                         sx={{
                                           backgroundColor: 'white',
-                                          color: '#ff5252',
+                                          color: getColorBasedOnName(capsule.patient),
                                           borderRadius: '20px',
                                           padding: '5px 15px',
                                           textTransform: 'none',
@@ -180,8 +179,8 @@ const Dashboard = () => {
                                       >
                                         {capsule.content}
                                       </Button>
-                                      <Divider sx={{ backgroundColor: 'white' }} />
-                                      <Typography variant="body2" color="white" sx={{ marginTop: '8px' }}>
+                                      <Divider />
+                                      <Typography variant="body2" sx={{ marginTop: '8px' }}>
                                         {capsule.date} - {capsule.time}
                                       </Typography>
                                     </>
@@ -204,32 +203,33 @@ const Dashboard = () => {
             <Card sx={{ borderRadius: '15px', boxShadow: 3, padding: '16px' }}>
               <CardContent>
                 <Grid container justifyContent="space-between" alignItems="center">
-                  <Typography id="patients-list-heading" variant="h5">Patient List</Typography>
+                  <Typography variant="h5">Patient List</Typography>
                   <Fade in={!loadingPatients} timeout={500}>
-                    <Button
-                      aria-labelledby="add-patient-button"
-                      variant="contained"
-                      color="primary"
-                      startIcon={<AddIcon />}
-                      onClick={handleAddPatient}
-                      sx={{
-                        borderRadius: '50px',
-                        textTransform: 'none',
-                        transition: '0.3s',
-                        '&:hover': {
-                          boxShadow: 6,
-                        },
-                      }}
-                    >
-                      Add Patient
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddPatient}
+                        sx={{
+                          borderRadius: '50px',
+                          textTransform: 'none',
+                          '&:hover': {
+                            boxShadow: 6,
+                          },
+                        }}
+                      >
+                        Add Patient
+                      </Button>
+
+                    </Box>
                   </Fade>
                 </Grid>
                 <Grid container spacing={2} marginTop={2}>
                   {loadingPatients ? (
                     Array.from(new Array(4)).map((_, index) => (
                       <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Skeleton variant="rectangular" height={100} animation="wave" aria-busy="true" aria-label="Loading patient data" />
+                        <Skeleton variant="rectangular" height={100} />
                       </Grid>
                     ))
                   ) : (
@@ -240,7 +240,6 @@ const Dashboard = () => {
                             onClick={() => handlePatientClick(patient.id)}
                             tabIndex={0}
                             role="button"
-                            aria-label={`Patient ${patient.name}`}
                             sx={{
                               borderRadius: '15px',
                               boxShadow: 3,
@@ -255,9 +254,7 @@ const Dashboard = () => {
                           >
                             <PersonIcon sx={{ marginRight: 2, color: 'primary.main' }} />
                             <CardContent>
-                              <Typography variant="body1" color="primary">
-                                {patient.name}
-                              </Typography>
+                              <Typography variant="body1">{patient.name}</Typography>
                             </CardContent>
                           </Card>
                         </Slide>
