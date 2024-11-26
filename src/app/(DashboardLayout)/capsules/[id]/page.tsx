@@ -13,7 +13,18 @@ const CapsuleDetail = () => {
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [remainingTime, setRemainingTime] = useState<string>('00:00'); // Initial remaining time
   const router = useRouter();
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = parseInt(event.key, 10);
+      if (!isNaN(key) && key > 0 && key.toString() == "0") {
+        // Select the capsule corresponding to the number pressed
+        router.push('/'); 
+      }
+    };
 
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   useEffect(() => {
     // Fetch capsule data based on the capsuleId from the URL
     const fetchCapsuleData = async () => {
